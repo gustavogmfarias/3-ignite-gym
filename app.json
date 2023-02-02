@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "imhere",
-    "slug": "imhere",
+    "name": "ignite-rn-03-ignite-gym",
+    "slug": "ignite-rn-03-ignite-gym",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,9 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
