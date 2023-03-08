@@ -38,14 +38,12 @@ export function Profile() {
         allowsEditing: true,
       });
 
-      if (photoSelected.canceled) {
+      if (photoSelected.cancelled) {
         return;
       }
 
-      if (photoSelected.assets[0].uri) {
-        const photoInfo = await FileSystem.getInfoAsync(
-          photoSelected.assets[0].uri
-        );
+      if (photoSelected.uri) {
+        const photoInfo = await FileSystem.getInfoAsync(photoSelected.uri);
 
         if (photoInfo.size && photoInfo.size / 1024 / 1024 > 2) {
           return toast.show({
@@ -55,7 +53,7 @@ export function Profile() {
           });
         }
 
-        setUserPhoto(photoSelected.assets[0].uri);
+        setUserPhoto(photoSelected.uri);
       }
     } catch (error) {
       console.log(error);
@@ -108,6 +106,7 @@ export function Profile() {
             mb={2}
             alignSelf="flex-start"
             mt={12}
+            fontFamily="heading"
           >
             Alterar senha
           </Heading>
