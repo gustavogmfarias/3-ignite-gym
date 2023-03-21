@@ -17,6 +17,7 @@ import { UserDTO } from "@dtos/UserDTO";
 export type AuthContextDataProps = {
   user: UserDTO;
   singIn: (email: string, password: string) => Promise<void>;
+  updateUserProfile: (userUpdated: UserDTO) => Promise<void>;
   signOut: () => Promise<void>;
   isLoadingUserStorageData: boolean;
 };
@@ -80,6 +81,15 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
+  async function updateUserProfile(userUpdated: UserDTO) {
+    try {
+      setUser(userUpdated);
+      await storageUserSave(userUpdated);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async function loadUserData() {
     try {
       setIsLoadingUserStorageData(true);
@@ -106,6 +116,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       value={{
         user,
         singIn,
+        updateUserProfile,
         signOut,
         isLoadingUserStorageData,
       }}
