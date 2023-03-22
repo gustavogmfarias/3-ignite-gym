@@ -15,6 +15,8 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import * as yup from "yup";
 
+import defaulUserPhotoImg from "@assets/userPhotoDefault.png";
+
 import { useAuth } from "@hooks/useAuth";
 
 import { api } from "@services/api";
@@ -57,13 +59,9 @@ const profileSchema = yup.object({
           .transform((value: any) => (!!value ? value : null)),
     }),
 });
-
 export function Profile() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
-  const [userPhoto, setUserPhoto] = useState(
-    "https://github.com/rodrigorgtic.png"
-  );
 
   const toast = useToast();
   const { user, updateUserProfile } = useAuth();
@@ -90,14 +88,16 @@ export function Profile() {
         allowsEditing: true,
       });
 
-      if (photoSelected.cancelled) {
+      if (photoSelected.canceled) {
         return;
       }
 
-      if (photoSelected.uri) {
-        const photoInfo = await FileSystem.getInfoAsync(photoSelected.uri);
+      if (photoSelected.assets[0].uri) {
+        const photoInfo = await FileSystem.getInfoAsync(
+          photoSelected.assets[0].uri
+        );
 
-        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 2) {
+        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
           return toast.show({
             title: "Essa imagem é muito grande. Escolha uma de até 5MB.",
             placement: "top",
@@ -105,7 +105,39 @@ export function Profile() {
           });
         }
 
-        setUserPhoto(photoSelected.uri);
+        const fileExtension = photoSelected.assets[0].uri.split(".").pop();
+
+        const photoFile = {
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          uri: photoSelected.assets[0].uri,
+          type: `${photoSelected.assets[0].type}/${fileExtension}`,
+        } as any;
+
+        const userPhotoUploadForm = new FormData();
+
+        userPhotoUploadForm.append("avatar", photoFile);
+
+        const avatarUpdtedResponse = await api.patch(
+          "/users/avatar",
+          userPhotoUploadForm,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        const userUpdated = user;
+
+        userUpdated.avatar = avatarUpdtedResponse.data.avatar;
+
+        await updateUserProfile(userUpdated);
+
+        toast.show({
+          title: "Foto atualizada!",
+          placement: "top",
+          bgColor: "green.500",
+        });
       }
     } catch (error) {
       console.log(error);
@@ -162,7 +194,11 @@ export function Profile() {
             />
           ) : (
             <UserPhoto
-              source={{ uri: userPhoto }}
+              source={
+                user.avatar
+                  ? { uri: `${api.defaults.baseURL}/avatar/${user.avatar}` }
+                  : defaulUserPhotoImg
+              }
               alt="Foto do usuário"
               size={PHOTO_SIZE}
             />
