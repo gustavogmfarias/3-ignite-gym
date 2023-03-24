@@ -4,6 +4,8 @@
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
+    "start:api": "cd D:\\VScode\\REACT-NATIVE\\2022\\ignite\\ignitegym-api && npm run dev",
+    "start:all": "start cmd.exe /K \"npm run start && npm run start:api\"",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
